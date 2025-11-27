@@ -14,13 +14,29 @@ import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
+from .models import CarMake, CarModel
+from .populate import initiate
 
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+@csrf_exempt
+def get_cars(request):
+    # Import here to prevent circular import issues
+    from .populate import initiate
 
-# Create your views here.
+    # Run populate only if models table is empty
+    if CarModel.objects.count() == 0:
+        initiate()
+
+    car_models = CarModel.objects.select_related('car_make')
+    cars = [{
+        "CarModel": car_model.name,
+        "CarMake": car_model.car_make.name
+    } for car_model in car_models]
+
+    return JsonResponse({"CarModels": cars})
 
 # Create a `login_request` view to handle sign in request
 @csrf_exempt

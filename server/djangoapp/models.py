@@ -1,30 +1,20 @@
 from django.db import models
-from django.utils.timezone import now
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-
-# Car Make Model
+# Car Make
 class CarMake(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField()
-    # You may add more fields if needed
+    description = models.TextField(blank=True)
 
     def __str__(self):
-        return self.name   # readable string representation
+        return self.name
 
-
-# Car Model Model
+# Car Model
 class CarModel(models.Model):
-
-    # Many-to-one relationship to CarMake
-    car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
-
-    # Required fields
     car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    year = models.IntegerField()
-    dealer_id = models.IntegerField(default=1)  # <-- THIS CAUSES THE ERROR
-    # Car type choices
+    dealer_id = models.IntegerField(default=1)
+
     CAR_TYPES = [
         ('SEDAN', 'Sedan'),
         ('SUV', 'SUV'),
@@ -33,15 +23,11 @@ class CarModel(models.Model):
         ('HATCH', 'Hatchback'),
         ('TRUCK', 'Truck'),
     ]
-
     type = models.CharField(max_length=10, choices=CAR_TYPES, default='SUV')
 
     year = models.IntegerField(
         default=2023,
-        validators=[
-            MaxValueValidator(2023),
-            MinValueValidator(2015)
-        ]
+        validators=[MaxValueValidator(2023), MinValueValidator(2015)]
     )
 
     def __str__(self):
